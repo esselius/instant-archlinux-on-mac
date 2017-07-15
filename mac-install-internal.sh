@@ -117,31 +117,6 @@ sed -i '/#\[multilib\]/,/#Include = \/etc\/pacman.d\/mirrorlist/ s/#//' /arch/et
 sed -i 's/#\[multilib\]/\[multilib\]/g' /arch/etc/pacman.conf
 
 ###############################################################################
-# Enable Infinality Fonts Repo
-# Temp disable signature checking. But restore at the end.
-# because of GPGME error: Inapproropriate ioctrl for device
-###############################################################################
-# echo "[infinality-bundle-fonts]" >> /arch/etc/pacman.conf
-# echo "Server = http://bohoomil.com/repo/fonts" >>/arch/etc/pacman.conf
-# echo "SigLevel = Never" >> /arch/etc/pacman.conf
-
-# echo "[infinality-bundle]" >> /arch/etc/pacman.conf
-# echo "Server = http://bohoomil.com/repo/x86_64" >>/arch/etc/pacman.conf
-# echo "SigLevel = Never" >> /arch/etc/pacman.conf
-
-# echo "[infinality-bundle-multilib]" >> /arch/etc/pacman.conf
-# echo "Server = http://bohoomil.com/repo/multilib/x86_64" >> /arch/etc/pacman.conf
-# echo "SigLevel = Never" >> /arch/etc/pacman.conf
-
-# chroot /arch pacman-key -r 962DDE58 # --keyserver hkp://subkeys.pgp.net
-# chroot /arch pacman-key --lsign 962DDE58
-
-# For whatever reason when the system comes back up it won't remember these keys.
-# So lets cache them and import them on first run.
-# chroot /arch mkdir -p /var/cache/keys
-# chroot /arch bash -c "pacman-key -e 962DDE58 > /var/cache/keys/962DDE58.pub"
-
-###############################################################################
 # Allow for colored output in pacman.conf
 ###############################################################################
 sed -i "s/#Color/Color/" /arch/etc/pacman.conf
@@ -177,17 +152,8 @@ echo "** Syncing pacman database & Update **"
 chroot /arch pacman -Syyu --noconfirm
 
 ###############################################################################
-# Have pacman use aria2 for downloads and give it extreme patience
-# This is mostly to keep the script from breaking on pacman timeout errors.
-###############################################################################
-# chroot /arch bash -c "(cd /var/cache/pacman/general && yes | pacman --noconfirm -U sqlite* aria2* c-ares*)"
-# echo "XferCommand = /usr/bin/printf 'Downloading ' && echo %u | awk -F/ '{printf \$NF}' && printf '...' && /usr/bin/aria2c -m0 -q --allow-overwrite=true -c --file-allocation=falloc --log-level=error --max-connection-per-server=2 --max-file-not-found=99 --min-split-size=5M --no-conf --remote-time=true --summary-interval=0 -t600 -d / -o %o %u && echo ' Complete!'" >> /etc/pacman.conf
-
-###############################################################################
 echo "Installing cached general packages"
 ###############################################################################
-# chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/general/package-quer*.pkg.tar.xz
-# chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/general/package-quer*.pkg.tar.xz
 chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/general/*.pkg.tar.xz
 
 ###############################################################################
@@ -197,45 +163,6 @@ chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/general/*.pkg.tar.
 
 echo "** Updating System **"
 chroot /arch pacman -Syyu --noconfirm
-
-
-###############################################################################
-# Setup Infinality Fonts
-# Moved to DOCKERFILE
-###############################################################################
-# chroot /arch pacman --noconfirm -Rdd freetype2 cairo fontconfig
-# chroot /arch pacman --noconfirm --needed -S infinality-bundle
-# # chroot /arch pacman --noconfirm --needed -S infinality-bundle-multilib
-
-# # Instal fonts
-# chroot /arch pacman --noconfirm -Rdd ttf-dejavu
-# chroot /arch pacman --noconfirm --needed -S ibfonts-meta-base
-
-# # Install ibfonts-meta-extended without the international fonts
-# # If you want international its "ibfonts-meta-extended"
-# chroot /arch pacman --noconfirm -Rdd cantarell-fonts
-# chroot /arch pacman --noconfirm --needed -S \
-#                       otf-cantarell-ib \
-#                       ibfonts-meta-extended-lt \
-#                       otf-oswald-ib \
-#                       otf-quintessential-ib \
-#                       otf-tex-gyre-ib \
-#                       t1-cursor-ib \
-#                       t1-urw-fonts-ib \
-#                       ttf-caladea-ib \
-#                       ttf-cantoraone-ib \
-#                       ttf-carlito-ib \
-#                       ttf-ddc-uchen-ib \
-#                       ttf-droid-ib \
-#                       ttf-gelasio-ib \
-#                       ttf-lohit-odia-ib \
-#                       ttf-lohit-punjabi-ib \
-#                       ttf-merriweather-ib \
-#                       ttf-merriweather-sans-ib \
-#                       ttf-noto-serif-multilang-ib \
-#                       ttf-opensans-ib \
-#                       ttf-signika-family-ib \
-#                       ttf-ubuntu-font-family-ib
 
 ###############################################################################
 # Setup our initial_configuration service
@@ -298,9 +225,7 @@ sed -i "s/${OLDLINE}/${NEWLINE}/" /arch/etc/mkinitcpio.conf
 if grep -i -A1 "Intel" /systeminfo | grep -qi "GPU" ; then
   echo "Machine has an Intel graphics card."
   sed -i "s/MODULES=\"/MODULES=\"i915 /" /arch/etc/mkinitcpio.conf
-  # chroot /arch pacman --noconfirm -R xorg-server
   chroot /arch pacman --noconfirm -S xf86-video-intel
-  # chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/custom/xf86-video-intel*.pkg.tar.xz
 
   # http://loicpefferkorn.net/2015/01/arch-linux-on-macbook-pro-retina-2014-with-dm-crypt-lvm-and-suspend-to-disk/
 
@@ -316,17 +241,6 @@ fi
 ###############################################################################
 if grep -i -A1 "AMD" /systeminfo | grep -qi "GPU" ; then
   echo "Machine has an AMD/ATI graphics card."
-
-  # Install drivers (opensource version)
-  # chroot /arch pacman --noconfirm --needed -S xf86-video-ati
-  # sed -i "s/MODULES=\"/MODULES=\"radeon /" /arch/etc/mkinitcpio.conf
-  #   mkdir -p /arch/usr/share/X11/xorg.conf.d
-  #   cat >/arch/usr/share/X11/xorg.conf.d/20-radeon.conf<<EOL
-  #   Section "Device"
-  #   Identifier "Radeon"
-  #   Driver "radeon"
-  #   EndSection
-  # EOL
 
   # Can not get open source drivers to work on the Mac Retina so using Catalyst
   sed -i "s/MODULES=\"/MODULES=\"fglrx /" /arch/etc/mkinitcpio.conf
@@ -442,22 +356,12 @@ echo "options snd_hda_intel model=intel-mac-auto"  >> /arch/etc/modprobe.d/snd_h
 ###############################################################################
 chroot /arch locale-gen en_US.UTF-8
 
-###############################################################################
-# Enable DKMS service
-###############################################################################
-# Seems to not exist anymore
-# chroot /arch systemctl enable dkms.service
-
 # Create new account that isn't root. user: user password: user
 # You can and should change this later https://wiki.archlinux.org/index.php/Change_username
 # Or just delete it and create another.
 ###############################################################################
 chroot /arch useradd -m -g users -G wheel -s /bin/zsh user
 chroot /arch bash -c "echo "user:user" | chpasswd"
-
-# Mark users password as expired so user changes it from user/user
-# User can't log into SDDM if I do this.
-# chroot /arch chage -d 0 user
 
 # allow passwordless sudo for our user
 echo "user ALL=(ALL) NOPASSWD: ALL" >> /arch/etc/sudoers
@@ -485,10 +389,6 @@ chroot /arch systemctl enable thermald
 chroot /arch runuser -l user -c "yaourt --noconfirm --needed -S cpupower"
 chroot /arch systemctl enable cpupower
 
-# works in a Linux docker container but not a mac boot2docker one
-# Will run at initial startup.
-# chroot /arch cpupower frequency-set -g powersave
-
 ###############################################################################
 # Get latest Early 2015 13" - Version 12,x wireless lan firware otherwise it won't work.
 ###############################################################################
@@ -499,15 +399,15 @@ chroot /arch systemctl enable cpupower
 ###############################################################################
 # Force reinstall microkernel updates so they appear in boot.
 ###############################################################################
-# chroot /arch pacman -S --noconfirm --needed intel-ucode
 chroot /arch pacman -S --noconfirm intel-ucode
 echo "done ucode"
+
 ###############################################################################
 # Setup rEFInd to boot up using Intel Micokernel updates
 ###############################################################################
 # Hit F2 for these options
 ls /dev
-#UUID=$(lsblk -no UUID /dev/sdb1) # Doesn't work in a docker container
+
 echo "start refind setup"
 UUID=$(blkid /dev/sdb -o export | grep UUID | head -1)
 echo $UUID
@@ -538,20 +438,7 @@ fi
 echo "efivarfs  /sys/firmware/efi/efivars efivarfs  rw,nosuid,nodev,noexec,relatime 0 0" >> /arch/etc/fstab
 echo "LABEL=EFI /boot/EFI vfat  rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro  0 2" >> /arch/etc/fstab
 echo "done fstab"
-###############################################################################
-# Share our Mac drive with Arch Linux (though read only unless we disable journaling in Mac Os)
-# https://support.apple.com/en-us/HT204435
-# https://wiki.archlinux.org/index.php/MacBook
-# Disabled - user can share later. If issue it breaks the install and difficult to tell why`
-###############################################################################
-# mkdir -p /media/mac
-# if [ $MODEL == "MacBook8,1" ]; then
-  # Macbook 12" 2015 uses nvme
-#  echo "/dev/nvme0n1p2    /media/mac     hfsplus auto,user,ro,exec   0 0" >> /arch/etc/fstab
-#else
-#  echo "/dev/sda2    /media/mac     hfsplus auto,user,ro,exec   0 0" >> /arch/etc/fstab
-#fi
-#echo "done sharing"
+
 ###############################################################################
 # Enable and setup SDDM Display Manger
 ###############################################################################
@@ -721,35 +608,6 @@ chroot /arch pacman --noconfirm -S linux
 # Needed or won't find the root device
 chroot /arch mkinitcpio -p linux
 
-# New Macbook Retina April 2015 Release
-# if [ $MODEL == "MacBook8,1" ]; then
-#   chroot /arch pacman --noconfirm -S linux-lts
-#   chroot /arch mkinitcpio -p linux-lts
-# fi
-
-###############################################################################
-# Rank mirrors by speed and only use https mirrors
-# Sometimes the mirrors page is down so this would break the script so
-# lets give it up to five minutes before timing out.
-###############################################################################
-# timeout=$(($(date +%s) + 360))
-# until \
-#   chroot /arch reflector \
-#   --verbose \
-#   -l 10 \
-#   --protocol https \
-#   --sort rate \
-#   --save /etc/pacman.d/mirrorlist \
-#   2>/dev/null || [[ $(date +%s) -gt $timeout ]]; do
-#   :
-# done
-
-###############################################################################
-# Delete the arch user
-###############################################################################
-# echo "Deleting arch user."
-# chroot /arch userdel -rf arch
-
 ###############################################################################
 # Move any general or custom packages into the pacman cache
 ###############################################################################
@@ -767,50 +625,14 @@ echo "Updating Databases"
 chroot /arch runuser -l user -c "yaourt -Syy"
 
 ###############################################################################
-# Restore pacman's security
-###############################################################################
-#echo "Restoring pacman's security"
-# chroot /arch sed -i "s/SigLevel = Never/#SigLevel = Never/g" /etc/pacman.conf
-# TODO: disables infinality fonts so this needs to be redone
-
-###############################################################################
 # Lets make sure that any config files etc our user has full ownership of.
 ###############################################################################
 chroot /arch chown -R user:users /home/user/
 
 ###############################################################################
-# Fix for: https://bugs.archlinux.org/task/42798
-# Otherwise pacman can not look up the keys remotely.
-# TODO confirm I do not need to do this on first run
-###############################################################################
-# chroot /arch  pacman-key --populate archlinux
-
-###############################################################################
-# Re-Import any keys we imported above.
-# We already did this above but for some reason we need to do it now or it
-# there will be db issues with pacman when ran.
-###############################################################################
-# chroot /arch pacman-key -r 962DDE58 --keyserver hkp://subkeys.pgp.net
-# chroot /arch pacman-key --lsign 962DDE58
-# chroot /arch pacman-key -r AE6866C7962DDE58 --keyserver hkp://subkeys.pgp.net
-# chroot /arch pacman-key --lsign AE6866C7962DDE58
-
-# if grep -i -A1 "AMD" /systeminfo | grep -qi "GPU" ; then
-#   chroot /arch pacman-key -r 653C3094 --keyserver hkp://subkeys.pgp.net
-#   chroot /arch pacman-key --lsign 653C3094
-# fi
-# chroot /arch pacman-key -u
-
-###############################################################################
 # Force root user to change password on next login.
 ###############################################################################
 chroot /arch chage -d 0 root
-
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-# UP TO THIS POINT WE HAVE NOT ACTUALLY MODIFIED THE USERS SYSTEM
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
 
 ###############################################################################
 # Mount the physical drive 
@@ -851,18 +673,6 @@ sleep 2
 # Unmount main disk
 umount /mnt/archlinux
 
-###############################################################################
-# TODO LIST
-###############################################################################
-# Powertop
-# Virtulbox VM of Archlinux on the Mac side
-# Shared volume
-# Encrypted user partition
-# Suspend to disk
-# Consider zram/zswap https://wiki.archlinux.org/index.php/Maximizing_performance
-# Looks like a ton of goodies in helmuthdu's script. https://github.com/helmuthdu/aui
-# Reverse Engineer iMac Retina's 5K. I notice that with rEFInd installed it defaults to 4k.
-# - Possible this can solve that: https://github.com/0xbb/apple_set_os.efi
 echo "*** FINISHED ***"
 
 # vim:set ts=2 sw=2 et:
