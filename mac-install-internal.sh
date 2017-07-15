@@ -270,13 +270,13 @@ echo applesmc >> /arch/etc/modules
 ###############################################################################
 # Enable Thermald 
 ###############################################################################
-chroot /arch runuser -l user -c "pacman --noconfirm --needed -S thermald"
+chroot /arch pacman --noconfirm --needed -S thermald
 chroot /arch systemctl enable thermald
 
 ###############################################################################
 # Enable cpupower and set governer to powersave
 ###############################################################################
-chroot /arch runuser -l user -c "pacman --noconfirm --needed -S cpupower"
+chroot /arch pacman --noconfirm --needed -S cpupower
 chroot /arch systemctl enable cpupower
 
 ###############################################################################
@@ -511,7 +511,7 @@ mv /arch/var/cache/pacman/custom/* /arch/var/cache/pacman/pkg/
 # TODO: See /usr/lib/pacman/*.sh
 ###############################################################################
 echo "Updating Databases"
-chroot /arch runuser -l user -c "pacman -Syy"
+chroot /arch pacman -Syy
 
 ###############################################################################
 # Lets make sure that any config files etc our user has full ownership of.
