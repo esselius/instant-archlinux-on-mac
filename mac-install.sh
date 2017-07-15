@@ -121,13 +121,6 @@ else
 fi
 
 ###############################################################################
-# Install wget to download Virtualbox
-###############################################################################
-# if ! hash wget 2> /dev/null; then
-#   brew install wget
-# fi
-
-###############################################################################
 # Install Virtualbox 
 ###############################################################################
 if ! hash vboxmanage 2> /dev/null; then
@@ -188,15 +181,6 @@ if ! hash boot2docker 2> /dev/null; then
     echo "Xcode 8.1 error most likely. Sadly for now you need to get this from developer.apple.com and install by hand "
     exit 1
   fi
-fi
-
-###############################################################################
-# Install ZSH and Oh-my-zsh
-# You don't need this but I like it when working with this since while debugging this script
-###############################################################################
-if ! hash zsh 2> /dev/null; then
-  echo "brew install zsh" > install_zsh.sh
-  echo "curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh" >> install_zsh.sh
 fi
 
 ###############################################################################
