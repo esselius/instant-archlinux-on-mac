@@ -464,11 +464,6 @@ chroot /arch sed -i "s/xterm/xfce4-terminal/" /home/user/.config/awesome/rc.lua
 chroot /arch sed -i '1s/^/vicious = require("vicious")\n/' \
                   /home/user/.config/awesome/rc.lua
 
-###############################################################################
-# Update mlocate
-###############################################################################
-chroot /arch updatedb
-
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # Final things before syncing to the physical drive.
@@ -490,15 +485,6 @@ chroot /arch mkinitcpio -p linux
 ###############################################################################
 echo "Moving any general or custom packages into pacman cache"
 mv /arch/var/cache/pacman/custom/* /arch/var/cache/pacman/pkg/
-
-###############################################################################
-# Update databases
-# Not exactly sure what pacman is doing that pacman isn't but 
-# pacman -Syy won't update everyting if the packages changed
-# TODO: See /usr/lib/pacman/*.sh
-###############################################################################
-echo "Updating Databases"
-chroot /arch pacman -Syy
 
 ###############################################################################
 # Lets make sure that any config files etc our user has full ownership of.
