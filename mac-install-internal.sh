@@ -137,13 +137,6 @@ echo "Server = http://mirrors.kernel.org/archlinux/\$repo/os/\$arch" > /arch/etc
 # (docker hub) plus it avoids hammering the mirrors while working on this. 
 # Plus it makes the install extremely fast.
 ###############################################################################
-mkdir -p /arch/var/cache/pacman/general/
-
-# Remove any development packages.
-# rm /var/cache/pacman/general/*devel*
-# # rm /var/cache/pacman/general/*-dev-*
-
-cp /var/cache/pacman/general/* /arch/var/cache/pacman/general/
 
 mkdir -p /arch/var/cache/pacman/custom/
 cp /var/cache/pacman/custom/* /arch/var/cache/pacman/custom/
@@ -152,11 +145,6 @@ cp /var/cache/pacman/custom/* /arch/var/cache/pacman/custom/
 echo "** Syncing pacman database & Update **"
 ###############################################################################
 chroot /arch pacman -Syyu --noconfirm
-
-###############################################################################
-echo "Installing cached general packages"
-###############################################################################
-chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/general/*.pkg.tar.xz
 
 ###############################################################################
 # update after pushing packages from docker container to get the system 
@@ -614,7 +602,6 @@ chroot /arch mkinitcpio -p linux
 # Move any general or custom packages into the pacman cache
 ###############################################################################
 echo "Moving any general or custom packages into pacman cache"
-mv /arch/var/cache/pacman/general/* /arch/var/cache/pacman/pkg/
 mv /arch/var/cache/pacman/custom/* /arch/var/cache/pacman/pkg/
 
 ###############################################################################
