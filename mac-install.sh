@@ -63,18 +63,6 @@ echo "Temporarily Disabling sudo password timeout"
 sudo sh -c 'echo "\nDefaults timestamp_timeout=-1">>/etc/sudoers'
 
 ###############################################################################
-# Mute startup chime
-# Unrem this to mute the startup chime (or set the volume 01 to 99 I think)
-###############################################################################
-# sudo /usr/sbin/nvram SystemAudioVolume=%01
-
-###############################################################################
-# Update Mac OSX 
-# particually any firmware updates (though lets leave this up to the user)
-###############################################################################
-# sudo softwareupdate -i -a
-
-###############################################################################
 # Convert from Core Storage to HFS+ if needed. 
 ###############################################################################
 if diskutil info ${ROOTDISK}s2 | grep -q "Core Storage"  ; then
