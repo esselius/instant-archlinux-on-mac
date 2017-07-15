@@ -343,7 +343,6 @@ EOL
 # Enable network manager
 ###############################################################################
 chroot /arch systemctl disable dhcpcd
-chroot /arch systemctl enable NetworkManager.service
 
 ###############################################################################
 # xfce4-terminal is my terminal of choice (for now)
