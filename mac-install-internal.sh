@@ -250,7 +250,7 @@ chroot /arch locale-gen en_US.UTF-8
 # You can and should change this later https://wiki.archlinux.org/index.php/Change_username
 # Or just delete it and create another.
 ###############################################################################
-chroot /arch useradd -m -g users -G wheel -s /bin/zsh user
+chroot /arch useradd -m -g users -G wheel -s /bin/sh user
 chroot /arch bash -c "echo "user:user" | chpasswd"
 
 # allow passwordless sudo for our user
@@ -463,18 +463,6 @@ chroot /arch sed -i "s/xterm/xfce4-terminal/" /home/user/.config/awesome/rc.lua
 # chroot /arch sed -i "s/nano/vim/" /home/user/.config/awesome/rc.lua
 chroot /arch sed -i '1s/^/vicious = require("vicious")\n/' \
                   /home/user/.config/awesome/rc.lua
-
-###############################################################################
-# Setup oh-my-zsh
-###############################################################################
-chroot /arch cp /usr/share/oh-my-zsh/zshrc /home/user/.zshrc
-chroot /arch sed -i "s/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"bullet-train\"/" \
-  /home/user/.zshrc
-chroot /arch sed -i "s/plugins=(git)/plugins=(git git-extras pip tmux python rsync cp archlinux node npm history-substring-search)/" \
-  /home/user/.zshrc
-echo "BULLETTRAIN_CONTEXT_SHOW=\"true\"" >> /arch/home/user/.zshrc
-echo "BULLETTRAIN_CONTEXT_BG=\"31\"" >> /arch/home/user/.zshrc
-echo "BULLETTRAIN_CONTEXT_FG=\"231\"" >> /arch/home/user/.zshrc
 
 ###############################################################################
 # Update mlocate
