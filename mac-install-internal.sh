@@ -281,6 +281,9 @@ if grep -i -A1 "NVIDIA" /systeminfo | grep -qi "GPU" ; then
   # Doesn't nothing
   # HOOKS="base udev block autodetect modconf filesystems keyboard fsck"
 
+  # Uninstall libglvnd since it will conflict with nividia-libgl
+  chroot /arch pacman --noconfirm -Rdd libglvnd
+
   # Install Nvidia DKMS and Utils 
   chroot /arch pacman --noconfirm --needed -U /var/cache/pacman/custom/nvidia-*-3*.pkg.tar.xz
 
