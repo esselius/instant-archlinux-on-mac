@@ -270,13 +270,13 @@ echo applesmc >> /arch/etc/modules
 ###############################################################################
 # Enable Thermald 
 ###############################################################################
-chroot /arch runuser -l user -c "yaourt --noconfirm --needed -S thermald"
+chroot /arch runuser -l user -c "pacman --noconfirm --needed -S thermald"
 chroot /arch systemctl enable thermald
 
 ###############################################################################
 # Enable cpupower and set governer to powersave
 ###############################################################################
-chroot /arch runuser -l user -c "yaourt --noconfirm --needed -S cpupower"
+chroot /arch runuser -l user -c "pacman --noconfirm --needed -S cpupower"
 chroot /arch systemctl enable cpupower
 
 ###############################################################################
@@ -506,12 +506,12 @@ mv /arch/var/cache/pacman/custom/* /arch/var/cache/pacman/pkg/
 
 ###############################################################################
 # Update databases
-# Not exactly sure what yaourt is doing that pacman isn't but 
+# Not exactly sure what pacman is doing that pacman isn't but 
 # pacman -Syy won't update everyting if the packages changed
-# TODO: See /usr/lib/yaourt/*.sh
+# TODO: See /usr/lib/pacman/*.sh
 ###############################################################################
 echo "Updating Databases"
-chroot /arch runuser -l user -c "yaourt -Syy"
+chroot /arch runuser -l user -c "pacman -Syy"
 
 ###############################################################################
 # Lets make sure that any config files etc our user has full ownership of.
